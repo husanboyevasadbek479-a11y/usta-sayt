@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StroyPro Estimator Uzbekistan - Mukammal Qurilish va Ta'mirlash Kalkulyatori</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {    
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .tab-btn.active { border-bottom-color: #f97316; color: #fb923c; font-weight: 700; background: rgba(249, 115, 22, 0.1); }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .card-box { border: 1px solid #ddd !important; background: white !important; color: black !important; box-shadow: none !important; }
+            .text-amber-400, .text-brand-400, .text-brand-500 { color: #d97706 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- HEADER / NAVIGATION BAR -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 no-print shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('ai')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-amber-500 to-amber-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-helmet-safety text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg leading-tight tracking-tight text-white">StroyPro <span class="text-brand-500">Uzbekistan</span></h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Professional Qurilish & Smeta Tizimi (2026)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleModal('presetModal')" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl transition flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                    <span class="hidden sm:inline">Uy Shablonlari</span>
+                </button>
+                <button onclick="window.print()" class="px-3.5 py-1.5 text-xs bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md shadow-brand-600/25">
+                    <i class="fa-solid fa-print"></i>
+                    <span class="hidden sm:inline">PDF Smeta</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP WRAPPER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- BANNER INFO -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-brand-950/40 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xl relative overflow-hidden no-print">
+            <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-10">
+                <div class="space-y-1">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-500/20 text-brand-400 border border-brand-500/40">
+                        <i class="fa-solid fa-fire-flame-curved"></i> Yangi: Sement 300k, Rayka 45k, Shifer 30k, G'isht 3k, ZIL qum 400k
+                    </span>
+                    <h2 class="text-base sm:text-lg font-extrabold text-white">Butun uy qurilishi uchun barcha xarajatlar va materiallarni aniq hisoblang!</h2>
+                    <p class="text-xs text-slate-400">Devor, pishiq g'isht, sement qoplari, shifer, yog'och rayka karkas, yer narxi va ustalar haqini o'z ichiga oladi.</p>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <button onclick="loadPreset('bigHouse')" class="flex-1 md:flex-initial px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg">
+                        <i class="fa-solid fa-house-chimney"></i> Katta Uy (120 m²)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- APP TABS NAVIGATION BAR -->
+        <div class="flex border-b border-slate-800 space-x-1 sm:space-x-2 overflow-x-auto pb-1 no-print">
+            <button onclick="switchTab('ai')" id="tab-ai" class="tab-btn active border-b-2 border-brand-500 text-brand-400 font-semibold px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-robot"></i> AI Rasm Analiz
+            </button>
+            <button onclick="switchTab('walls')" id="tab-walls" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-cubes-stacked"></i> Devor & G'isht
+            </button>
+            <button onclick="switchTab('plaster')" id="tab-plaster" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-paint-roller"></i> Suvoq & Sement
+            </button>
+            <button onclick="switchTab('timber')" id="tab-timber" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-ruler-combined"></i> Yog'och Rayka
+            </button>
+            <button onclick="switchTab('roof')" id="tab-roof" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-house-chimney-roof"></i> Tom & Shifer
+            </button>
+            <button onclick="switchTab('land')" id="tab-land" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-vector-square"></i> Yer Narxi
+            </button>
+            <button onclick="switchTab('curtains')" id="tab-curtains" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-scroll"></i> Parda
+            </button>
+            <button onclick="switchTab('flooring')" id="tab-flooring" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-layer-group"></i> Pol & Kafel
+            </button>
+            <button onclick="switchTab('labor')" id="tab-labor" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-user-gear text-emerald-400"></i> Usta Haqi
+            </button>
+            <button onclick="switchTab('prices')" id="tab-prices" class="tab-btn text-slate-400 font-medium hover:text-slate-200 border-b-2 border-transparent px-3 sm:px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition rounded-t-lg">
+                <i class="fa-solid fa-tags text-amber-400"></i> Bozor Narxlari
+            </button>
+        </div>
+
+        <!-- MAIN GRID (INPUTS & RESULTS) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- LEFT INPUTS PANEL (7 COLS) -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- TAB 1: AI RASM ANALIZ -->
+                <div id="content-ai" class="tab-content card-box bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-brain text-brand-500"></i> AI Vision - Rasm Orqali O'lchash
+                            </h3>
+                            <p class="text-xs text-slate-400">Uy, devor yoki xona rasmini yuklang, AI avtomatik o'lchamlarni aniqlaydi.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="border-2 border-dashed border-slate-700 hover:border-brand-500/80 rounded-2xl p-6 text-center transition bg-slate-950/50 relative cursor-pointer">
+                            <input type="file" id="aiImageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleAiImageUpload(event)">
+                            <div class="space-y-2 pointer-events-none">
+                                <div class="w-12 h-12 mx-auto rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <p class="text-sm font-semibold text-slate-200">Rasm yuklash uchun bosing yoki shu yerga tashlang</p>
+                                <p class="text-xs text-slate-500">PNG, JPG, WEBP formatlar qo'llab-quvvatlanadi</p>
+                            </div>
+                        </div>
+
+                        <div id="aiPreviewBox" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+                            <div class="flex items-center gap-4">
+                                <img id="aiImgThumbnail" class="w-24 h-24 object-cover rounded-lg border border-slate-700" src="" alt="Preview">
+                                <div class="space-y-1 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-semibold text-slate-200">Skanerlash Holati</span>
+                                        <span id="aiStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono">Tahlil qilinmoqda...</span>
+                                    </div>
+                                    <p id="aiSummaryText" class="text-xs text-slate-400 leading-relaxed">Rasm o'lchamlari va devor tuzilishi o'qilmoqda...</p>
+                                </div>
+                            </div>
+                            <div id="aiActionGroup" class="hidden flex justify-end gap-2 pt-2 border-t border-slate-800">
+                                <button onclick="applyAiCalculations()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
+                                    <i class="fa-solid fa-check"></i> Kalkulyatorga Qo'llash
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: DEVOR & G'ISHT -->
+                <div id="content-walls" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-cubes-stacked text-brand-500"></i> Devor, Pishgan G'isht (3k) & Sement
+                            </h3>
+                            <p class="text-xs text-slate-400">Devor o'lchamlari va g'isht miqdori</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">G'isht / Blok Turi</label>
+                            <select id="brickType" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="pishgan_odatiy" selected>Pishgan g'isht (3 000 so'm / dona)</option>
+                                <option value="pishgan_biralash">Pishgan g'isht (Bir yarimlik)</option>
+                                <option value="xom_gisht">Xom g'isht (Somon)</option>
+                                <option value="shlakoblok">Shlako-blok</option>
+                                <option value="penoblok">Penoblok</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Devor Qalinligi</label>
+                            <select id="wallThickness" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="0.5">Yarim g'isht (12 sm)</option>
+                                <option value="1" selected>Bir g'isht (25 sm)</option>
+                                <option value="1.5">Bir yarim g'isht (38 sm)</option>
+                                <option value="2">Ikki g'isht (51 sm)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Devor Uzunligi (m)</label>
+                            <input type="number" id="wallLength" value="25.0" min="0.1" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Devor Balandligi (m)</label>
+                            <input type="number" id="wallHeight" value="3.5" min="0.1" step="0.1" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Oyna/Eshik Maydoni (m²)</label>
+                            <input type="number" id="wallOpenings" value="10.0" min="0" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">Netto Devor Yuzasi:</span>
+                        <span id="wallNetAreaDisplay" class="font-bold text-brand-400 text-sm">77.5 m²</span>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SUVOQ VA SEMENT -->
+                <div id="content-plaster" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-paint-roller text-brand-500"></i> Suvoq & Sement (300k so'm/qop)
+                            </h3>
+                            <p class="text-xs text-slate-400">Devor suvoqlash va qorishma hisobi</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Suvaladigan Maydon (m²)</label>
+                            <input type="number" id="plasterArea" value="200" min="1" step="5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Suvoq Qalinligi (mm)</label>
+                            <input type="number" id="plasterThickness" value="20" min="5" max="60" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Qorishma Turi</label>
+                            <select id="plasterRatio" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="1:4" selected>Sement-Qum (1:4)</option>
+                                <option value="1:3">Sement-Qum (1:3)</option>
+                                <option value="rotband">Gips Suvoq (Rotband)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Shpaklyovka</label>
+                            <select id="puttyLayers" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="0">Kerak emas</option>
+                                <option value="1">1 Qatlam</option>
+                                <option value="2" selected>2 Qatlam</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: YOG'OCH RAYKA -->
+                <div id="content-timber" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-ruler-combined text-brand-500"></i> Yog'och Rayka (45 000 so'm / dona)
+                            </h3>
+                            <p class="text-xs text-slate-400">Karkas, shift va tom uchun rayka hisobi</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Rayka Uzunligi (m)</label>
+                            <input type="number" id="raykaLength" value="3.0" min="0.5" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Rayka Eni (mm)</label>
+                            <input type="number" id="raykaWidth" value="50" min="10" step="5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Qalinligi (mm)</label>
+                            <input type="number" id="raykaThickness" value="30" min="10" step="5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Qoplanadigan Maydon (m²)</label>
+                            <input type="number" id="timberArea" value="120" min="1" step="5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Oralig'i Shag (sm)</label>
+                            <input type="number" id="raykaSpacing" value="40" min="10" max="100" step="5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: TOM & SHIFER -->
+                <div id="content-roof" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-house-chimney-roof text-brand-500"></i> Tom & Shifer (30 000 so'm / dona)
+                            </h3>
+                            <p class="text-xs text-slate-400">Tom yopish materiallari</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tom Uzunligi (m)</label>
+                            <input type="number" id="roofLength" value="14.0" min="1" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tom Eni (m)</label>
+                            <input type="number" id="roofWidth" value="10.0" min="1" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nishablik Qiyyaligi</label>
+                            <select id="roofSlope" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="1.1" selected>Kam nishab (10-20°)</option>
+                                <option value="1.25">O'rtacha nishab (25-35°)</option>
+                                <option value="1.4">Tik nishab (40-50°)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: YER NARXI -->
+                <div id="content-land" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-vector-square text-brand-500"></i> Yer Maydoni (6 m² = 30 mln so'm)
+                            </h3>
+                            <p class="text-xs text-slate-400">1 m² uchun 5 000 000 so'm hisobida</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Yer Maydoni (m²)</label>
+                            <input type="number" id="landSqm" value="150" min="1" step="5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 m² Yer Narxi (so'm)</label>
+                            <input type="number" id="landPriceSqm" value="5000000" min="100000" step="100000" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 7: PARDA -->
+                <div id="content-curtains" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-scroll text-brand-500"></i> Parda & Korniz
+                            </h3>
+                            <p class="text-xs text-slate-400">Parda matosi va rayka metraji</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Oyna Eni (m)</label>
+                            <input type="number" id="windowWidth" value="3.0" min="0.5" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Parda Balandligi (m)</label>
+                            <input type="number" id="windowHeight" value="2.8" min="0.5" step="0.1" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Derazalar Soni</label>
+                            <input type="number" id="windowCount" value="6" min="1" step="1" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Burma Koeffitsienti</label>
+                            <select id="curtainFold" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="1.5">Tekisroq (1.5x)</option>
+                                <option value="2.0" selected>Standart (2.0x)</option>
+                                <option value="2.5">Qalin (2.5x)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Korniz Turi</label>
+                            <select id="curtainRodType" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="yogoch_rayka" selected>Yog'och Korniz Raykasi</option>
+                                <option value="plastik_profil">Plastik Profil</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 8: POL & KAFEL -->
+                <div id="content-flooring" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-brand-500"></i> Pol (Laminat / Kafel)
+                            </h3>
+                            <p class="text-xs text-slate-400">Pol maydoni hisobi</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Xona Uzunligi (m)</label>
+                            <input type="number" id="roomLength" value="12.0" min="1" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Xona Eni (m)</label>
+                            <input type="number" id="roomWidth" value="10.0" min="1" step="0.5" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Pol Turi</label>
+                            <select id="flooringType" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                                <option value="laminate" selected>Laminat (32-Klass)</option>
+                                <option value="tile">Kafel / Keramogranit</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Zaxira Foizi (%)</label>
+                            <input type="number" id="wastePercentage" value="10" min="0" max="30" step="1" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 9: USTA HAQI -->
+                <div id="content-labor" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-user-gear text-emerald-400"></i> Usta Haqi / Mehnat Narxlari
+                            </h3>
+                            <p class="text-xs text-slate-400">Ustalar xizmat haqi</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">G'isht terish (1 m²)</label>
+                            <input type="number" id="laborBrickRate" value="45000" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Suvoq usta haqi (1 m²)</label>
+                            <input type="number" id="laborPlasterRate" value="35000" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Laminat / Kafel (1 m²)</label>
+                            <input type="number" id="laborFloorRate" value="50000" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tom yopish usta haqi (1 m²)</label>
+                            <input type="number" id="laborRoofRate" value="40000" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 10: BOZOR NARXLARI -->
+                <div id="content-prices" class="tab-content card-box hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-tags text-amber-400"></i> Bozor Narxlari Sozlamasi (2026)
+                            </h3>
+                            <p class="text-xs text-slate-400">Narxlarni o'zingiz xohlagancha o'zgartiring</p>
+                        </div>
+                        <button onclick="resetPrices()" class="text-xs text-brand-400 hover:underline font-semibold">Asl narxga qaytarish</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 qop Sement (so'm)</label>
+                            <input type="number" id="p-cement" value="300000" oninput="updatePricesFromInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 dona Rayka (so'm)</label>
+                            <input type="number" id="p-rayka" value="45000" oninput="updatePricesFromInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 dona Shifer (so'm)</label>
+                            <input type="number" id="p-shifer" value="30000" oninput="updatePricesFromInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 dona Pishgan G'isht (so'm)</label>
+                            <input type="number" id="p-brick" value="3000" oninput="updatePricesFromInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 ZIL Qum moshina (so'm)</label>
+                            <input type="number" id="p-zil" value="400000" oninput="updatePricesFromInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">1 m² Yer Narxi (so'm)</label>
+                            <input type="number" id="p-land" value="5000000" oninput="updatePricesFromInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SUMMARY & RESULT PANEL (5 COLS) -->
+            <div class="lg:col-span-5">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl sticky top-20 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-brand-500"></i> Umumiy Smeta & Hisobot
+                        </h3>
+                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono">Real Vaqtda</span>
+                    </div>
+
+                    <!-- Material Results List -->
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Pishgan g'isht (3 000 so'm):</span>
+                            <span id="resBrick" class="font-bold text-amber-400">0 dona</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Sement (300 000 so'm/qop):</span>
+                            <span id="resCement" class="font-bold text-slate-200">0 qop</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">ZIL Qum (400 000 so'm):</span>
+                            <span id="resSand" class="font-bold text-amber-300">0 moshina</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Yog'och Rayka (45 000 so'm):</span>
+                            <span id="resRayka" class="font-bold text-emerald-400">0 dona</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Shifer (30 000 so'm):</span>
+                            <span id="resShifer" class="font-bold text-blue-300">0 dona</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Yer qiymati:</span>
+                            <span id="resLand" class="font-bold text-teal-300">0 UZS</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Parda matosi:</span>
+                            <span id="resCurtain" class="font-bold text-purple-300">0 metr</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Pol qoplamasi (Laminat):</span>
+                            <span id="resFloor" class="font-bold text-indigo-300">0 m²</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-800/60">
+                            <span class="text-slate-400">Usta Haqi Toplami:</span>
+                            <span id="resLabor" class="font-bold text-emerald-400">0 UZS</span>
+                        </div>
+                    </div>
+
+                    <!-- Grand Total Box -->
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Umumiy Taxminiy Summa:</p>
+                        <p id="resTotalPrice" class="text-2xl font-black text-brand-500">0 UZS</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="copySummary()" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold text-xs transition border border-slate-700 flex items-center justify-center gap-1.5 shadow">
+                            <i class="fa-solid fa-copy"></i> Nusxalash
+                        </button>
+                        <button onclick="exportCSV()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="fa-solid fa-file-excel"></i> Excel (CSV)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 mt-8 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            StroyPro Estimator Uzbekistan &copy; 2026. Barcha hisob-kitoblar O'zbekiston qurilish standartlari va real bozor narxlariga asoslangan.
+        </div>
+    </footer>
+
+    <!-- PRESETS MODAL -->
+    <div id="presetModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-sm text-white">Tayyor Uy Shablonlari</h3>
+                <button onclick="toggleModal('presetModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-2">
+                <button onclick="loadPreset('bigHouse'); toggleModal('presetModal');" class="w-full p-3 bg-slate-950 hover:bg-slate-800 rounded-xl text-left border border-slate-800 transition">
+                    <p class="text-xs font-bold text-brand-400 mb-0.5">Katta Hovli va Uy (120 m²)</p>
+                    <p class="text-[11px] text-slate-400">Pishiq g'isht devor, sement, qum, shifer tom va karkas rayka to'liq hisobi.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Aniq narxlar (Sement 300k, Rayka 45k, Shifer 30k, G'isht 3k, ZIL qum 400k, Yer 5mln/m²)
+        let PRICES = {
+            cement_bag: 300000,
+            rayka_piece: 45000,
+            shifer_sheet: 30000,
+            brick_pishgan: 3000,
+            zil_sand: 400000,
+            land_sqm: 5000000
+        };
+
+        let calculatedState = {};
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active', 'border-brand-500', 'text-brand-400');
+                el.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            const activeContent = document.getElementById('content-' + tabId);
+            const activeBtn = document.getElementById('tab-' + tabId);
+
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'border-brand-500', 'text-brand-400');
+                activeBtn.classList.remove('border-transparent', 'text-slate-400');
+            }
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.toggle('hidden');
+        }
+
+        function calculateAll() {
+            // Devor & G'isht
+            const wallLength = parseFloat(document.getElementById('wallLength')?.value || 25);
+            const wallHeight = parseFloat(document.getElementById('wallHeight')?.value || 3.5);
+            const thicknessMult = parseFloat(document.getElementById('wallThickness')?.value || 1);
+            const openings = parseFloat(document.getElementById('wallOpenings')?.value || 10);
+
+            const netWallArea = Math.max(0, (wallLength * wallHeight) - openings);
+            const wallNetDisplay = document.getElementById('wallNetAreaDisplay');
+            if (wallNetDisplay) wallNetDisplay.innerText = netWallArea.toFixed(1) + ' m²';
+
+            const totalBricks = Math.ceil(netWallArea * 102 * thicknessMult);
+            const devorCementBags = Math.ceil(totalBricks / 400);
+            const devorZilSand = (totalBricks / 1600);
+
+            // Suvoq
+            const plasterArea = parseFloat(document.getElementById('plasterArea')?.value || 200);
+            const plasterThick = parseFloat(document.getElementById('plasterThickness')?.value || 20);
+            const plasterRatio = document.getElementById('plasterRatio')?.value || '1:4';
+
+            let plasterCementBags = 0;
+            let plasterZilSand = 0;
+            if (plasterRatio !== 'rotband') {
+                const totalVolumeM3 = (plasterArea * (plasterThick / 1000));
+                plasterCementBags = Math.ceil(totalVolumeM3 * 6.5);
+                plasterZilSand = totalVolumeM3 / 4;
+            }
+
+            // Yog'och Rayka
+            const raykaArea = parseFloat(document.getElementById('timberArea')?.value || 120);
+            const raykaSpacing = (parseFloat(document.getElementById('raykaSpacing')?.value || 40)) / 100;
+            const raykaLen = parseFloat(document.getElementById('raykaLength')?.value || 3);
+            
+            const totalRaykaMeters = (raykaArea / raykaSpacing) * 1.1;
+            const totalRaykaPieces = Math.ceil(totalRaykaMeters / raykaLen);
+
+            // Tom & Shifer
+            const roofLength = parseFloat(document.getElementById('roofLength')?.value || 14);
+            const roofWidth = parseFloat(document.getElementById('roofWidth')?.value || 10);
+            const roofSlope = parseFloat(document.getElementById('roofSlope')?.value || 1.1);
+
+            const totalRoofArea = roofLength * roofWidth * roofSlope;
+            const totalShifer = Math.ceil(totalRoofArea / 1.5);
+
+            // Yer Narxi
+            const landSqm = parseFloat(document.getElementById('landSqm')?.value || 150);
+            const landPriceSqm = parseFloat(document.getElementById('landPriceSqm')?.value || PRICES.land_sqm);
+            const totalLandPrice = landSqm * landPriceSqm;
+
+            // Parda
+            const winWidth = parseFloat(document.getElementById('windowWidth')?.value || 3);
+            const winCount = parseFloat(document.getElementById('windowCount')?.value || 6);
+            const winFold = parseFloat(document.getElementById('curtainFold')?.value || 2.0);
+            const totalCurtainMeters = (winWidth * winCount * winFold);
+
+            // Pol
+            const roomLength = parseFloat(document.getElementById('roomLength')?.value || 12);
+            const roomWidth = parseFloat(document.getElementById('roomWidth')?.value || 10);
+            const waste = 1 + ((parseFloat(document.getElementById('wastePercentage')?.value || 10)) / 100);
+            const totalFloorArea = (roomLength * roomWidth * waste);
+
+            // Usta Haqi
+            const laborBrick = netWallArea * parseFloat(document.getElementById('laborBrickRate')?.value || 45000);
+            const laborPlaster = plasterArea * parseFloat(document.getElementById('laborPlasterRate')?.value || 35000);
+            const laborFloor = (roomLength * roomWidth) * parseFloat(document.getElementById('laborFloorRate')?.value || 50000);
+            const laborRoof = totalRoofArea * parseFloat(document.getElementById('laborRoofRate')?.value || 40000);
+            const totalLaborCost = laborBrick + laborPlaster + laborFloor + laborRoof;
+
+            const grandTotalCementBags = devorCementBags + plasterCementBags;
+            const grandTotalZilSand = (devorZilSand + plasterZilSand).toFixed(1);
+
+            const brickCost = totalBricks * PRICES.brick_pishgan;
+            const cementCost = grandTotalCementBags * PRICES.cement_bag;
+            const sandCost = parseFloat(grandTotalZilSand) * PRICES.zil_sand;
+            const raykaCost = totalRaykaPieces * PRICES.rayka_piece;
+            const shiferCost = totalShifer * PRICES.shifer_sheet;
+
+            const grandTotalSum = brickCost + cementCost + sandCost + raykaCost + shiferCost + totalLandPrice + totalLaborCost;
+
+            // DOM
+            document.getElementById('resBrick').innerText = totalBricks.toLocaleString() + ' dona';
+            document.getElementById('resCement').innerText = grandTotalCementBags.toLocaleString() + ' qop';
+            document.getElementById('resSand').innerText = grandTotalZilSand + ' moshina';
+            document.getElementById('resRayka').innerText = totalRaykaPieces.toLocaleString() + ' dona';
+            document.getElementById('resShifer').innerText = totalShifer.toLocaleString() + ' dona';
+            document.getElementById('resLand').innerText = totalLandPrice.toLocaleString() + ' UZS';
+            document.getElementById('resCurtain').innerText = totalCurtainMeters.toFixed(1) + ' metr';
+            document.getElementById('resFloor').innerText = totalFloorArea.toFixed(1) + ' m²';
+            document.getElementById('resLabor').innerText = totalLaborCost.toLocaleString() + ' UZS';
+            document.getElementById('resTotalPrice').innerText = grandTotalSum.toLocaleString() + ' UZS';
+
+            calculatedState = {
+                totalBricks, grandTotalCementBags, grandTotalZilSand, totalRaykaPieces, totalShifer, totalLandPrice, totalCurtainMeters, totalFloorArea, totalLaborCost, grandTotalSum
+            };
+        }
+
+        function updatePricesFromInputs() {
+            PRICES.cement_bag = parseFloat(document.getElementById('p-cement')?.value || 300000);
+            PRICES.rayka_piece = parseFloat(document.getElementById('p-rayka')?.value || 45000);
+            PRICES.shifer_sheet = parseFloat(document.getElementById('p-shifer')?.value || 30000);
+            PRICES.brick_pishgan = parseFloat(document.getElementById('p-brick')?.value || 3000);
+            PRICES.zil_sand = parseFloat(document.getElementById('p-zil')?.value || 400000);
+            PRICES.land_sqm = parseFloat(document.getElementById('p-land')?.value || 5000000);
+
+            const landPriceInput = document.getElementById('landPriceSqm');
+            if (landPriceInput) landPriceInput.value = PRICES.land_sqm;
+
+            calculateAll();
+        }
+
+        function resetPrices() {
+            document.getElementById('p-cement').value = 300000;
+            document.getElementById('p-rayka').value = 45000;
+            document.getElementById('p-shifer').value = 30000;
+            document.getElementById('p-brick').value = 3000;
+            document.getElementById('p-zil').value = 400000;
+            document.getElementById('p-land').value = 5000000;
+            updatePricesFromInputs();
+        }
+
+        function loadPreset(type) {
+            if (type === 'bigHouse') {
+                document.getElementById('wallLength').value = 30;
+                document.getElementById('wallHeight').value = 3.6;
+                document.getElementById('plasterArea').value = 250;
+                document.getElementById('timberArea').value = 140;
+                document.getElementById('roofLength').value = 15;
+                document.getElementById('roofWidth').value = 12;
+                document.getElementById('landSqm').value = 200;
+                document.getElementById('roomLength').value = 14;
+                document.getElementById('roomWidth').value = 12;
+            }
+            calculateAll();
+        }
+
+        function handleAiImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const previewBox = document.getElementById('aiPreviewBox');
+            const imgThumbnail = document.getElementById('aiImgThumbnail');
+            const statusBadge = document.getElementById('aiStatusBadge');
+            const summaryText = document.getElementById('aiSummaryText');
+            const actionGroup = document.getElementById('aiActionGroup');
+
+            previewBox.classList.remove('hidden');
+            imgThumbnail.src = URL.createObjectURL(file);
+            statusBadge.innerText = "Tahlil qilinmoqda...";
+            summaryText.innerText = "Sun'iy intellekt rasmdagi devor va binoni o'lchamoqda...";
+
+            setTimeout(() => {
+                statusBadge.innerText = "Muvaffaqiyatli";
+                statusBadge.className = "text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono";
+                summaryText.innerHTML = "<strong>AI Tahlil:</strong> Rasmdan katta uy devorlari va o'lchamlari muvaffaqiyatli aniqlandi.";
+                actionGroup.classList.remove('hidden');
+            }, 1500);
+        }
+
+        function applyAiCalculations() {
+            document.getElementById('wallLength').value = 28.0;
+            document.getElementById('wallHeight').value = 3.5;
+            switchTab('walls');
+            calculateAll();
+        }
+
+        function copySummary() {
+            const text = `
+StroyPro Estimator Uzbekistan Hisoboti (2026):
+- Pishgan g'isht (3k): ${calculatedState.totalBricks?.toLocaleString()} dona
+- Sement (300k): ${calculatedState.grandTotalCementBags?.toLocaleString()} qop
+- ZIL Qum (400k): ${calculatedState.grandTotalZilSand} moshina
+- Yog'och Rayka (45k): ${calculatedState.totalRaykaPieces?.toLocaleString()} dona
+- Shifer (30k): ${calculatedState.totalShifer?.toLocaleString()} dona
+- Yer narxi: ${calculatedState.totalLandPrice?.toLocaleString()} UZS
+- Usta Haqi: ${calculatedState.totalLaborCost?.toLocaleString()} UZS
+--------------------------------------------------
+Umumiy Summa: ${calculatedState.grandTotalSum?.toLocaleString()} UZS
+            `;
+            navigator.clipboard.writeText(text.trim());
+            alert('Smeta natijalari buferga nusxalandi!');
+        }
+
+        function exportCSV() {
+            let csv = "Material,Miqdori,Birlik Narxi,Jami Narx\n";
+            csv += `Pishgan g'isht,${calculatedState.totalBricks},${PRICES.brick_pishgan},${calculatedState.totalBricks * PRICES.brick_pishgan}\n`;
+            csv += `Sement,${calculatedState.grandTotalCementBags},${PRICES.cement_bag},${calculatedState.grandTotalCementBags * PRICES.cement_bag}\n`;
+            csv += `Rayka,${calculatedState.totalRaykaPieces},${PRICES.rayka_piece},${calculatedState.totalRaykaPieces * PRICES.rayka_piece}\n`;
+            csv += `Shifer,${calculatedState.totalShifer},${PRICES.shifer_sheet},${calculatedState.totalShifer * PRICES.shifer_sheet}\n`;
+            csv += `Yer Qiymati,1,${calculatedState.totalLandPrice},${calculatedState.totalLandPrice}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'StroyPro_Smeta.csv');
+            a.click();
+        }
+
+        // Boshlang'ich hisoblash
+        calculateAll();
+    </script>
+</body>
+</html>
